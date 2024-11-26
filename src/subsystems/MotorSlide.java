@@ -6,17 +6,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class MotorSlide {
     private final DcMotor _left;
     private final DcMotor _right;
-    private final int _max;
     private final int _min;
-    private final double _power;
+    private final int _max;
 
-    public MotorSlide(HardwareMap hardwareMap, String left, String right, int max, int min, double power) {
+    public MotorSlide(HardwareMap hardwareMap, String left, String right, int min, int max) {
         _left = hardwareMap.get(DcMotor.class, left);
         _right = hardwareMap.get(DcMotor.class, right);
 
-        _max = max;
         _min = min;
-        _power = power;
+        _max = max;
 
         _left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         _right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -28,66 +26,61 @@ public class MotorSlide {
         _right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void extend(int increment) {
-        int newLeftPosition = _left.getCurrentPosition() + increment;
-        int newRightPosition = _right.getCurrentPosition() + increment;
-
-        if (newLeftPosition <= _max) {
-            _left.setPower(_power);
-        } else {
-            _left.setPower(0);
-        }
-
-        if (newRightPosition <= _max) {
-            _right.setPower(_power);
-        } else {
-            _right.setPower(0);
-        }
-    }
-
-    public void retract(int increment) {
-        int newLeftPosition = _left.getCurrentPosition() - increment;
-        int newRightPosition = _right.getCurrentPosition() - increment;
-
-        if (newLeftPosition >= _min) {
-            _left.setPower(-_power);
-        } else {
-            _left.setPower(0);
-        }
-
-        if (newRightPosition >= _min) {
-            _right.setPower(-_power);
-        } else {
-            _right.setPower(0);
-        }
-    }
-
-    public void extendFull() {
+    public void extend(double power) {
         if (_left.getCurrentPosition() < _max) {
-            _left.setPower(_power);
+            _left.setPower(Math.abs(power));
         } else {
             _left.setPower(0);
         }
 
         if (_right.getCurrentPosition() < _max) {
-            _right.setPower(_power);
+            _right.setPower(Math.abs(power));
         } else {
             _right.setPower(0);
         }
     }
 
-    public void retractFull() {
+    // Retract the slides with a given power
+    public void retract(double power) {
         if (_left.getCurrentPosition() > _min) {
-            _left.setPower(-_power);
+            _left.setPower(-Math.abs(power));
         } else {
             _left.setPower(0);
         }
 
         if (_right.getCurrentPosition() > _min) {
-            _right.setPower(-_power);
+            _right.setPower(-Math.abs(power));
         } else {
             _right.setPower(0);
         }
+    }
+
+
+    public void extendTo(int targetPosition, double power) {
+        if (targetPosition < _min || targetPosition > _max) {
+            return;
+        }
+
+        if (_left.getCurrentPosition() < targetPosition) {
+            _left.setPower(Math.abs(power));
+        } else {
+            _left.setPower(0);
+        }
+
+        if (_right.getCurrentPosition() < targetPosition) {
+            _right.setPower(Math.abs(power));
+        } else {
+            _right.setPower(0);
+        }
+    }
+
+
+    public void extendFull(double power) {
+        extendTo(_max, power);
+    }
+
+    public void retractFull(double power) {
+        extendTo(_min, -power); // Use negative power for retraction
     }
 
     public void stop() {
@@ -95,12 +88,12 @@ public class MotorSlide {
         _right.setPower(0);
     }
 
-    public boolean isFullExtended() {
+    public boolean isFullyExtended() {
         return (_left.getCurrentPosition() >= _max &&
                 _right.getCurrentPosition() >= _max);
     }
 
-    public boolean isFullRetracted() {
+    public boolean isFullyRetracted() {
         return (_left.getCurrentPosition() <= _min &&
                 _right.getCurrentPosition() <= _min);
     }

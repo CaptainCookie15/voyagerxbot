@@ -26,6 +26,11 @@ public class Claw {
         _right.setPosition(0);
     }
 
+    public void openTo(double position) {
+        _left.setPosition(position);
+        _right.setPosition(position);
+    }
+
     public boolean isOpen() {
         return (_left.getPosition()>=(0.99) &&
                 _right.getPosition()>=(0.99));
@@ -34,6 +39,11 @@ public class Claw {
     public boolean isClosed() {
         return (_left.getPosition()<=(0.01) &&
                 _right.getPosition()<=(0.01));
+    }
+
+    public boolean isAt(double position) {
+        return (_left.getPosition()>=(position-0.01) && _left.getPosition()<=(position+0.01) &&
+                _right.getPosition()>=(position-0.01) && _right.getPosition()<=(position+0.01));
     }
 
     public int getLeftPosition() {

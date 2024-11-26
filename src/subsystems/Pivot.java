@@ -33,7 +33,12 @@ public class Pivot {
         _right.setPosition(0);
     }
 
-    public boolean isOut {
+    public void flipTo(double position) {
+        _left.setPosition(position);
+        _right.setPosition(position);
+    }
+
+    public boolean isOut() {
         return (_left.getPosition()>=(0.99) &&
                 _right.getPosition()>=(0.99));
     }
@@ -41,5 +46,18 @@ public class Pivot {
     public boolean isIn() {
         return (_left.getPosition()<=(0.01) &&
                 _right.getPosition()<=(0.01));
+    }
+
+    public boolean isAt(double position) {
+        return (_left.getPosition()>=(position-0.01) && _left.getPosition()<=(position+0.01) &&
+                _right.getPosition()>=(position-0.01) && _right.getPosition()<=(position+0.01));
+    }
+
+    public int getLeftPosition() {
+        return _left.getPosition();
+    }
+
+    public int getRightPosition() {
+        return _right.getPosition();
     }
 }
